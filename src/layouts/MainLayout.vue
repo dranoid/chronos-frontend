@@ -30,13 +30,18 @@
             </router-link>
           </div>
           <div class="text-h q-ml-lg">
-            Profile <q-icon name="account_circle" size="md" />
+            <router-link
+              :to="{ name: 'profile' }"
+              style="text-decoration: none; color: white"
+            >
+              Profile <q-icon name="account_circle" size="md" />
+            </router-link>
           </div>
         </q-toolbar>
       </q-header>
     </div>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
+    <q-drawer v-if="showHeader" v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
         <q-item-label header> Essential Links </q-item-label>
 
@@ -55,8 +60,10 @@
           :is="Component"
           @add-to-cart="handleAddToCart"
           @delete-item="handleDeleteItem"
+          @login-user="handleLoginUser"
           :cart="cart"
           :items="items"
+          :user="user"
         />
       </router-view>
     </q-page-container>
@@ -87,6 +94,13 @@ const linksList = [
     icon: "dashboard",
     link: "/dashboard",
     admin: true,
+  },
+  {
+    title: "Logout",
+    caption: "Logout of this session",
+    icon: "logout",
+    link: "/login",
+    admin: false,
   },
   // {
   //   title: "Discord Chat Channel",
@@ -130,16 +144,26 @@ export default defineComponent({
   setup() {
     const leftDrawerOpen = ref(false);
     const route = useRoute();
-    const isUserAdmin = ref(false);
+    const user = ref(null);
     const cart = ref([]);
     const items = ref([]);
 
+    const isUserAdmin = computed(() => {
+      if (user.value) {
+        return user.value.roles[0] == "admin" ? true : false;
+      }
+      return false;
+    });
     const routeName = computed(() => {
       return route.name;
     });
     const showHeader = computed(() => {
       return routeName.value !== "login" && routeName.value !== "register";
     });
+
+    const handleLoginUser = (payload) => {
+      user.value = payload;
+    };
 
     const handleAddToCart = (payload) => {
       // Scaffolding the orderObj
@@ -181,11 +205,13 @@ export default defineComponent({
 
     return {
       essentialLinks: linksList,
+      user,
       cart,
       items,
       leftDrawerOpen,
       isUserAdmin,
       showHeader,
+      handleLoginUser,
       handleAddToCart,
       handleDeleteItem,
       toggleLeftDrawer() {

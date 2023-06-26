@@ -47,7 +47,7 @@ import axios from "axios";
 
 export default {
   // name: 'PageName',
-  setup() {
+  setup(_, { emit }) {
     const router = useRouter();
     const $q = useQuasar();
     const email = ref("");
@@ -64,8 +64,8 @@ export default {
     };
 
     const onSubmit = async () => {
-      const isLogin = await login(email.value, password.value);
-      if (!isLogin) {
+      const user = await login(email.value, password.value);
+      if (!user) {
         $q.notify({
           color: "red-5",
           textColor: "white",
@@ -74,6 +74,7 @@ export default {
         });
         return;
       }
+      emit("login-user", user);
       router.push("/");
     };
 

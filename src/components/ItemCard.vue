@@ -34,7 +34,7 @@ export default {
   name: "ItemCard",
   props: ["item"],
   setup(props, { emit }) {
-    const qty = ref(3);
+    const qty = ref(0);
     const $q = useQuasar();
 
     const decreaseQty = () => {
@@ -66,6 +66,8 @@ export default {
         return;
       }
       emit("add-to-cart", { item: props.item, order_qty: qty.value });
+
+      qty.value = 0;
     };
 
     return {
