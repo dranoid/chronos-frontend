@@ -1,0 +1,60 @@
+<template>
+  <q-item clickable v-if="showAdminLink">
+    <router-link :to="link" style="text-decoration: none; color: black">
+      <q-item-section v-if="icon" avatar>
+        <q-icon :name="icon" />
+      </q-item-section>
+    </router-link>
+
+    <router-link :to="link" style="text-decoration: none; color: black">
+      <q-item-section>
+        <q-item-label>{{ title }}</q-item-label>
+        <q-item-label caption>{{ caption }}</q-item-label>
+      </q-item-section>
+    </router-link>
+  </q-item>
+</template>
+
+<script>
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "EssentialLink",
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+
+    caption: {
+      type: String,
+      default: "",
+    },
+
+    link: {
+      type: String,
+      default: "#",
+    },
+
+    icon: {
+      type: String,
+      default: "",
+    },
+
+    isAdmin: {
+      type: Boolean,
+    },
+    admin: {
+      type: Boolean,
+    },
+  },
+  computed: {
+    showAdminLink() {
+      if (!this.admin || (this.isAdmin && this.admin)) {
+        return true;
+      }
+      return false;
+    },
+  },
+});
+</script>

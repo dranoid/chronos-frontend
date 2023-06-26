@@ -1,0 +1,127 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Laptop",
+      "description": "A device to code",
+      "qty": 1000,
+      "price": 300000
+    },
+    {
+      "id": 2,
+      "name": "Cowries",
+      "description": "A tribute to the gods",
+      "qty": 952,
+      "price": 200
+    },
+    {
+      "id": 3,
+      "name": "Bottle",
+      "description": "An arsenal thing to do",
+      "qty": 936,
+      "price": 150
+    },
+    {
+      "id": 4,
+      "name": "Cap",
+      "description": "An obvious statement of falsehood",
+      "qty": 888,
+      "price": 1500
+    },
+    {
+      "id": 5,
+      "name": "Doll",
+      "description": "A keepsake for barbie fans",
+      "qty": 700,
+      "price": 6000
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Emi trabaye",
+      "email": "pofikon561@rockdian.com",
+      "password": "user",
+      "roles": ["user"],
+      "order": [
+        {
+          "list": [
+            {
+              "product": {
+                "$oid": "6473b3532373560dda683ee0"
+              },
+              "orderQuantity": 3,
+              "_id": {
+                "$oid": "64766db4bf473de7ce7ebc2d"
+              }
+            },
+            {
+              "product": {
+                "$oid": "6473b3702373560dda683ee7"
+              },
+              "orderQuantity": 4,
+              "_id": {
+                "$oid": "64766db4bf473de7ce7ebc2e"
+              }
+            },
+            {
+              "product": {
+                "$oid": "6473b38d2373560dda683eee"
+              },
+              "orderQuantity": 7,
+              "_id": {
+                "$oid": "64766db4bf473de7ce7ebc2f"
+              }
+            }
+          ],
+          "_id": {
+            "$oid": "64766db4bf473de7ce7ebc2c"
+          }
+        },
+        {
+          "list": [
+            {
+              "product": {
+                "$oid": "6473b3532373560dda683ee0"
+              },
+              "orderQuantity": 3,
+              "_id": {
+                "$oid": "64766e3b8f49bb1768efa0f4"
+              }
+            },
+            {
+              "product": {
+                "$oid": "6473b3702373560dda683ee7"
+              },
+              "orderQuantity": 4,
+              "_id": {
+                "$oid": "64766e3b8f49bb1768efa0f5"
+              }
+            },
+            {
+              "product": {
+                "$oid": "6473b38d2373560dda683eee"
+              },
+              "orderQuantity": 7,
+              "_id": {
+                "$oid": "64766e3b8f49bb1768efa0f6"
+              }
+            }
+          ],
+          "_id": {
+            "$oid": "64766e3b8f49bb1768efa0f3"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Administrator",
+      "email": "admin@admin.com",
+      "phone": "+2348166570313",
+      "password": "admin",
+      "roles": ["admin"],
+      "order": []
+    }
+  ]
+}
