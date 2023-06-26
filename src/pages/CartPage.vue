@@ -14,6 +14,13 @@
           <div class="text-center text-h5">Order</div>
         </q-card-section>
 
+        <q-card-section class="row justify-between">
+          <span>Name</span>
+          <span>Price</span>
+          <span>Quantity</span>
+          <q-btn flat disabled color="white">x</q-btn>
+        </q-card-section>
+
         <q-separator inset />
 
         <CartItem
@@ -28,8 +35,14 @@
           <span class="text-h6">NGN {{ total }}</span>
         </q-card-section>
 
-        <q-card-actions>
-          <q-btn color="primary" @click="handleOrderClick">Order</q-btn>
+        <q-card-actions class="row justify-end">
+          <q-btn
+            class="q-ma-md"
+            style="width: 100%"
+            color="primary"
+            @click="handleOrderClick"
+            >Order</q-btn
+          >
         </q-card-actions>
       </q-card>
     </div>
@@ -46,7 +59,7 @@ export default {
   components: {
     CartItem,
   },
-  setup(props) {
+  setup(props, { emit }) {
     const total = computed(() => {
       let amount = 0;
       const cart = props.cart;
@@ -60,6 +73,7 @@ export default {
     });
     const handleOrderClick = () => {
       console.log("Order-placed");
+      emit("place-order");
     };
 
     return {

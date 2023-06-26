@@ -15,8 +15,6 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
-import getItems from "../composables/items";
 import ItemCard from "../components/ItemCard.vue";
 
 export default {
@@ -24,19 +22,6 @@ export default {
   components: {
     ItemCard,
   },
-  setup() {
-    const items = ref([]);
-
-    async function fetchData() {
-      items.value = await getItems();
-    }
-
-    onMounted(() => {
-      fetchData();
-    });
-    return {
-      items,
-    };
-  },
+  props: ["items"],
 };
 </script>

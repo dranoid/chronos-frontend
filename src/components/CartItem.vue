@@ -14,9 +14,6 @@ export default {
   name: "CartItem",
   props: ["cartItem"],
   emits: ["delete-item"],
-  setup(props) {
-    console.log(props.cartItem);
-  },
 };
 </script>
 

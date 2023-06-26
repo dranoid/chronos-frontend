@@ -56,6 +56,7 @@
           @add-to-cart="handleAddToCart"
           @delete-item="handleDeleteItem"
           :cart="cart"
+          :items="items"
         />
       </router-view>
     </q-page-container>
@@ -65,6 +66,11 @@
 <script>
 import { defineComponent, ref, computed } from "vue";
 import { useRoute } from "vue-router";
+import {
+  getItems,
+  findItemIndex,
+  findCartItemIndex,
+} from "../composables/items";
 import EssentialLink from "components/EssentialLink.vue";
 
 const linksList = [
@@ -126,6 +132,7 @@ export default defineComponent({
     const route = useRoute();
     const isUserAdmin = ref(false);
     const cart = ref([]);
+    const items = ref([]);
 
     const routeName = computed(() => {
       return route.name;
@@ -135,6 +142,7 @@ export default defineComponent({
     });
 
     const handleAddToCart = (payload) => {
+      // Scaffolding the orderObj
       const orderObj = {
         product: { id: 0, name: "", price: 0 },
         orderQuantity: 0,
@@ -143,16 +151,38 @@ export default defineComponent({
       orderObj.product.id = payload.item.id;
       orderObj.product.name = payload.item.name;
       orderObj.product.price = payload.item.price;
+
+      // To update inventory
+      const itemIndex = findItemIndex(items.value, payload.item.id);
+      const item = items.value[itemIndex];
+      item.qty -= payload.order_qty;
+
+      // To merge duplicates
+      const cartItemIndex = findCartItemIndex(cart.value, orderObj.product.id);
+      if (cartItemIndex != undefined) {
+        const cartItem = cart.value[cartItemIndex];
+        cartItem.orderQuantity += orderObj.orderQuantity;
+        return;
+      }
       cart.value.push(orderObj);
-      console.log(cart.value, "weee");
     };
     const handleDeleteItem = (payload) => {
-      cart.value.splice(payload, 1);
+      const delItem = cart.value.splice(payload, 1)[0];
+
+      // To update inventory
+      const itemIndex = findItemIndex(items.value, delItem.product.id);
+      const item = items.value[itemIndex];
+      item.qty += delItem.orderQuantity;
     };
+    async function fetchData() {
+      items.value = await getItems();
+    }
+    fetchData();
 
     return {
       essentialLinks: linksList,
       cart,
+      items,
       leftDrawerOpen,
       isUserAdmin,
       showHeader,

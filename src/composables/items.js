@@ -10,4 +10,24 @@ const getItems = async () => {
   }
 };
 
-export default getItems;
+function findItemIndex(itemArr, payloadItemId) {
+  let index = undefined;
+  itemArr.forEach((item, ind) => {
+    if (item.id == payloadItemId) {
+      index = ind;
+    }
+  });
+  return index;
+}
+
+function findCartItemIndex(cart, payloadItemId) {
+  let index = undefined;
+  cart.forEach((cartItem, ind) => {
+    if (cartItem.product.id == payloadItemId) {
+      index = ind;
+    }
+  });
+  return index;
+}
+
+export { findItemIndex, getItems, findCartItemIndex };

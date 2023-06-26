@@ -13,7 +13,7 @@
         {{ item.name }}
         <p>{{ item.description }}</p>
       </div>
-      <div>NGN {{ item.price }}</div>
+      <div>NGN {{ item.price }}. Amount instock: {{ item.qty }}</div>
       <div class="row justify-end">
         <q-card-actions style="font-size: 1.5em">
           <q-btn class="q-mx-sm" flat @click="decreaseQty">-</q-btn>
