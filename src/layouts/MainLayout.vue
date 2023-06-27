@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { defineComponent, ref, computed } from "vue";
+import { defineComponent, ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import {
   getItems,
@@ -201,7 +201,9 @@ export default defineComponent({
     async function fetchData() {
       items.value = await getItems();
     }
-    fetchData();
+    onMounted(() => {
+      fetchData();
+    });
 
     return {
       essentialLinks: linksList,
