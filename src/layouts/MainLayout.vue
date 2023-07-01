@@ -24,9 +24,13 @@
               style="text-decoration: none; color: white"
             >
               Cart <q-icon name="shopping_cart" size="md" />
-              <q-badge v-if="cart.length" color="orange" rounded floating>{{
-                cart.length
-              }}</q-badge>
+              <q-badge
+                v-if="cart && cart.length"
+                color="orange"
+                rounded
+                floating
+                >{{ cart.length }}</q-badge
+              >
             </router-link>
           </div>
           <div class="text-h q-ml-lg">
@@ -50,6 +54,7 @@
           :key="link.title"
           v-bind="link"
           :isAdmin="isUserAdmin"
+          @click="handleEssentialClick(link)"
         />
       </q-list>
     </q-drawer>
@@ -61,6 +66,7 @@
           @add-to-cart="handleAddToCart"
           @delete-item="handleDeleteItem"
           @login-user="handleLoginUser"
+          @get-item="handleGetItem"
           :cart="cart"
           :items="items"
           :user="user"
@@ -71,14 +77,13 @@
 </template>
 
 <script>
-import { defineComponent, ref, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import {
-  getItems,
-  findItemIndex,
-  findCartItemIndex,
-} from "../composables/items";
+import jwtDecode from "jwt-decode";
+import { useQuasar } from "quasar";
+import { defineComponent, ref, computed, onMounted, onUpdated } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { findItemIndex, findCartItemIndex } from "../composables/items";
 import EssentialLink from "components/EssentialLink.vue";
+import { api } from "src/boot/axios";
 
 const linksList = [
   {
@@ -102,36 +107,6 @@ const linksList = [
     link: "/login",
     admin: false,
   },
-  // {
-  //   title: "Discord Chat Channel",
-  //   caption: "chat.quasar.dev",
-  //   icon: "chat",
-  //   link: "https://chat.quasar.dev",
-  // },
-  // {
-  //   title: "Forum",
-  //   caption: "forum.quasar.dev",
-  //   icon: "record_voice_over",
-  //   link: "https://forum.quasar.dev",
-  // },
-  // {
-  //   title: "Twitter",
-  //   caption: "@quasarframework",
-  //   icon: "rss_feed",
-  //   link: "https://twitter.quasar.dev",
-  // },
-  // {
-  //   title: "Facebook",
-  //   caption: "@QuasarFramework",
-  //   icon: "public",
-  //   link: "https://facebook.quasar.dev",
-  // },
-  // {
-  //   title: "Quasar Awesome",
-  //   caption: "Community Quasar projects",
-  //   icon: "favorite",
-  //   link: "https://awesome.quasar.dev",
-  // },
 ];
 
 export default defineComponent({
@@ -142,8 +117,10 @@ export default defineComponent({
   },
 
   setup() {
+    const $q = useQuasar();
     const leftDrawerOpen = ref(false);
     const route = useRoute();
+    const router = useRouter();
     const user = ref(null);
     const cart = ref([]);
     const items = ref([]);
@@ -163,7 +140,12 @@ export default defineComponent({
 
     const handleLoginUser = (payload) => {
       user.value = payload;
+      $q.localStorage.set("user-details", payload);
     };
+    function handleGetItem(payload) {
+      items.value = payload;
+      $q.localStorage.set("items-details", payload);
+    }
 
     const handleAddToCart = (payload) => {
       // Scaffolding the orderObj
@@ -189,6 +171,7 @@ export default defineComponent({
         return;
       }
       cart.value.push(orderObj);
+      $q.localStorage.set("cart-details", cart.value);
     };
     const handleDeleteItem = (payload) => {
       const delItem = cart.value.splice(payload, 1)[0];
@@ -198,11 +181,56 @@ export default defineComponent({
       const item = items.value[itemIndex];
       item.qty += delItem.orderQuantity;
     };
-    async function fetchData() {
-      items.value = await getItems();
+    function handleEssentialClick(linkObj) {
+      if (linkObj.title == "Logout") {
+        logOut();
+      }
     }
+    function logOut() {
+      $q.localStorage.remove("access-token");
+      $q.localStorage.remove("user-details");
+      $q.localStorage.remove("items-details");
+      $q.localStorage.remove("cart-details");
+      router.push("/login");
+      api.get("http://localhost:3000/users/me/logout");
+    }
+    function isTokenExpired(token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        if (decodedToken.exp && decodedToken.exp < currentTime) {
+          // Token has expired
+          return true;
+        } else {
+          // Token is still valid
+          return false;
+        }
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        return true; // Treat token as expired if decoding fails
+      }
+    }
+
     onMounted(() => {
-      fetchData();
+      if ($q.localStorage.has("user-details")) {
+        user.value = $q.localStorage.getItem("user-details");
+      }
+      if ($q.localStorage.has("items-details")) {
+        items.value = $q.localStorage.getItem("items-details");
+      }
+      if ($q.localStorage.has("cart-details")) {
+        cart.value = $q.localStorage.getItem("cart-details");
+      }
+    });
+
+    onUpdated(() => {
+      console.log("iya yin");
+      const token = $q.localStorage.getItem("access-token");
+      if (token && isTokenExpired(token)) {
+        // Token has expired, logout
+        logOut();
+      }
     });
 
     return {
@@ -216,6 +244,8 @@ export default defineComponent({
       handleLoginUser,
       handleAddToCart,
       handleDeleteItem,
+      handleGetItem,
+      handleEssentialClick,
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },

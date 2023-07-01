@@ -2,7 +2,7 @@
   <q-page padding>
     <!-- content -->
     <div class="text-h4 q-my-md">Cart</div>
-    <div v-if="cart.length == 0">
+    <div v-if="cartComp.length == 0">
       <p class="text-italic">
         Nothing in your cart yet. Check out the
         <router-link to="/" class="text-primary">store.</router-link>
@@ -24,7 +24,7 @@
         <q-separator inset />
 
         <CartItem
-          v-for="(cartItem, index) in cart"
+          v-for="(cartItem, index) in cartComp"
           :cartItem="cartItem"
           :key="index"
           @delete-item="$emit('delete-item', index)"
@@ -51,6 +51,7 @@
 
 <script>
 import { computed, ref } from "vue";
+import { useQuasar } from "quasar";
 import CartItem from "src/components/CartItem.vue";
 
 export default {
@@ -60,6 +61,7 @@ export default {
     CartItem,
   },
   setup(props, { emit }) {
+    const $q = useQuasar();
     const total = computed(() => {
       let amount = 0;
       const cart = props.cart;
@@ -71,12 +73,19 @@ export default {
       });
       return amount;
     });
+
+    const cartComp = computed(() => {
+      // Check if layout data prop is available, otherwise fallback to local storage
+      return props.cart || $q.localStorage.getItem("cart-details");
+    });
+
     const handleOrderClick = () => {
       console.log("Order-placed");
       emit("place-order");
     };
 
     return {
+      cartComp,
       total,
       handleOrderClick,
     };

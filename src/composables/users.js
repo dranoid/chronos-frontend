@@ -1,8 +1,14 @@
-import axios from "axios";
+import { api } from "src/boot/axios";
+import { LocalStorage } from "quasar";
 
 async function getUsers() {
   try {
-    const res = await axios.get("http://localhost:3000/users");
+    const res = await api.get("http://localhost:3000/users", {
+      // headers: {
+      //   Authorization: `Bearer ${authToken}`,
+      // },
+    });
+
     const users = res.data;
     return users;
   } catch (e) {
@@ -10,4 +16,11 @@ async function getUsers() {
   }
 }
 
-export { getUsers };
+function getUserRole() {
+  const user = LocalStorage.getItem("user-details");
+  if (user && user.roles) {
+    return user.roles[0];
+  }
+}
+
+export { getUsers, getUserRole };

@@ -3,7 +3,11 @@ const routes = [
     path: "/",
     component: () => import("layouts/MainLayout.vue"),
     children: [
-      { path: "", component: () => import("pages/ItemsPage.vue") },
+      {
+        path: "",
+        component: () => import("pages/ItemsPage.vue"),
+        meta: { requiresAuth: true },
+      },
       {
         path: "/register",
         component: () => import("pages/SignupPage.vue"),
@@ -18,16 +22,19 @@ const routes = [
         path: "/dashboard",
         component: () => import("pages/DashboardPage.vue"),
         name: "dashboard",
+        meta: { requiresAuth: true, requiredRoles: ["admin"] },
       },
       {
         path: "/profile",
         component: () => import("pages/ProfilePage.vue"),
         name: "profile",
+        meta: { requiresAuth: true },
       },
       {
         path: "/cart",
         component: () => import("pages/CartPage.vue"),
         name: "cart",
+        meta: { requiresAuth: true },
       },
     ],
   },

@@ -19,7 +19,7 @@
 
           <q-input
             filled
-            v-model="number"
+            v-model="phone"
             label="Your phone number"
             lazy-rules
             :rules="[
@@ -64,21 +64,25 @@
 </template>
 
 <script>
+import { ref } from "vue";
+import { useQuasar } from "quasar";
+import { useRouter } from "vue-router";
+import { api } from "src/boot/axios";
+
 export default {
   // name: 'PageName',
-  data() {
-    return {
-      name: "",
-      email: "",
-      password: "",
-      accept: false,
-      number: null,
-    };
-  },
-  methods: {
-    onSubmit() {
-      if (!this.accept) {
-        this.$q.notify({
+  setup(_, { emit }) {
+    const $q = useQuasar();
+    const name = ref("");
+    const email = ref("");
+    const password = ref("");
+    const accept = ref(false);
+    const phone = ref(null);
+    const router = useRouter();
+
+    async function onSubmit() {
+      if (!accept.value) {
+        $q.notify({
           color: "red-5",
           textColor: "white",
           icon: "warning",
@@ -86,19 +90,58 @@ export default {
         });
         return;
       }
+      const body = {
+        name: name.value,
+        email: email.value,
+        password: password.value,
+        phone: phone.value,
+      };
+
+      try {
+        const res = await api.post("http://localhost:3000/register", body);
+        const data = res.data;
+
+        $q.localStorage.set("access-token", data.access_token);
+        emit("login-user", data.user);
+
+        console.log(data);
+      } catch (e) {
+        if (e.response)
+          $q.notify({
+            color: "red-5",
+            textColor: "white",
+            icon: "warning",
+            message: e.response.data.message,
+          });
+        console.log(e);
+        return;
+      }
+      router.push("/");
       // this.$api
-      this.$router.push("/");
-    },
-    isValidEmail(val) {
+    }
+
+    function isValidEmail(val) {
       const emailPattern =
         /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;
       return emailPattern.test(val) || "Invalid email";
-    },
-    isValidPhone(val) {
+    }
+
+    function isValidPhone(val) {
       const phoneNumPattern = /^(\+\d{1,3}\s?)?\d{11}$/;
 
       return phoneNumPattern.test(val) || "Invalid Phone number";
-    },
+    }
+
+    return {
+      name,
+      email,
+      password,
+      accept,
+      phone,
+      onSubmit,
+      isValidEmail,
+      isValidPhone,
+    };
   },
 };
 </script>

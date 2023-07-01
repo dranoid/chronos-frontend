@@ -1,8 +1,9 @@
-import axios from "axios";
+import { api } from "src/boot/axios";
 
 const getItems = async () => {
   try {
-    const res = await axios.get("http://localhost:3000/products");
+    console.log("items");
+    const res = await api.get("http://localhost:3000/products");
     const items = res.data;
     return items;
   } catch (e) {

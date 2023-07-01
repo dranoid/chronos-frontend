@@ -13,8 +13,9 @@
     </div>
 
     <div class="users-crud">
+      <div class="text-h5 q-mt-xl">Manage Users</div>
       <q-input
-        class="q-mb-lg q-mt-xl"
+        class="q-mb-lg q-mt-sm"
         v-model="searchName"
         filled
         label="Search users"
@@ -25,7 +26,7 @@
       <q-card>
         <div v-for="(user, index) in filteredUsers" :key="index">
           <q-card-section class="row justify-start">
-            <div class="col-6 self-end">
+            <div class="col-8 self-end">
               <q-input
                 filled
                 v-model="user.name"
@@ -52,11 +53,17 @@
                   (val) => (val && val.length > 0) || 'Please type something',
                 ]"
               />
-              <p>ID: {{ user.id }}</p>
+              <q-select
+                filled
+                v-model="user.roles[0]"
+                :options="['user', 'admin']"
+                label="Filled"
+              />
+              <p>ID: {{ user._id }}</p>
             </div>
             <div class="col-4 self-start">
-              <q-btn class="q-mx-md">Update</q-btn>
-              <q-btn class="q-mx-md">Delete</q-btn>
+              <q-btn class="q-ma-md">Update</q-btn>
+              <q-btn class="q-ma-md">Delete</q-btn>
             </div>
           </q-card-section>
         </div>
@@ -64,8 +71,9 @@
     </div>
 
     <div class="items-crud">
+      <div class="text-h5 q-mt-xl">Manage Items</div>
       <q-input
-        class="q-mb-lg q-mt-xl"
+        class="q-mb-lg q-mt-sm"
         v-model="searchItem"
         filled
         label="Search items"
@@ -73,7 +81,7 @@
         lazy-rules
         :rules="[(val) => (val && val.length > 0) || 'Please type something']"
       />
-      <q-card>
+      <q-card class="q-pa-md">
         <div v-for="(item, index) in filteredItems" :key="index">
           <q-card-section class="row justify-start">
             <div class="col-8 self-end">
@@ -115,15 +123,35 @@
                   (val) => (val && val.length > 0) || 'Please type something',
                 ]"
               />
-              <p>ID: {{ item.id }}</p>
+              <p>ID: {{ item._id }}</p>
             </div>
             <div class="col-4 self-start">
-              <q-btn class="q-mx-md">Update</q-btn>
-              <q-btn class="q-mx-md">Delete</q-btn>
+              <q-btn class="q-ma-md">Update</q-btn>
+              <q-btn class="q-ma-md">Delete</q-btn>
             </div>
           </q-card-section>
         </div>
-        <div><q-btn>Add Item</q-btn></div>
+        <div>
+          <q-toggle v-model="expanded" label="Expanded" class="q-mb-md" />
+
+          <q-expansion-item
+            v-model="expanded"
+            icon="perm_identity"
+            label="Account settings"
+            caption="John Doe"
+          >
+            <q-card>
+              <q-card-section>
+                This is where the add ite form will be Lorem ipsum dolor sit
+                amet, consectetur adipisicing elit. Quidem, eius reprehenderit
+                eos corrupti commodi magni quaerat ex numquam, dolorum officiis
+                modi facere maiores architecto suscipit iste eveniet doloribus
+                ullam aliquid.
+              </q-card-section>
+            </q-card>
+          </q-expansion-item>
+          <q-btn>Add Item</q-btn>
+        </div>
       </q-card>
     </div>
   </q-page>
@@ -161,7 +189,7 @@ export default {
       const filt = usersForMeta.value.filter((user) => {
         return (
           user.name.toLowerCase().includes(searchName.value.toLowerCase()) ||
-          user.id.toString().includes(searchName.value.toLowerCase())
+          user._id.toString().includes(searchName.value.toLowerCase())
         );
       });
 
@@ -174,7 +202,7 @@ export default {
           item.description
             .toLowerCase()
             .includes(searchItem.value.toLowerCase()) ||
-          item.id.toString().includes(searchItem.value.toLowerCase())
+          item._id.toString().includes(searchItem.value.toLowerCase())
         );
       });
 
