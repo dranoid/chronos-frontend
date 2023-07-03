@@ -1,5 +1,5 @@
 <template>
-  <q-item clickable v-if="showAdminLink">
+  <q-item clickable v-if="showAdminLink" @click="handleClick">
     <router-link :to="link" style="text-decoration: none; color: black">
       <q-item-section v-if="icon" avatar>
         <q-icon :name="icon" />
@@ -46,6 +46,11 @@ export default defineComponent({
     },
     admin: {
       type: Boolean,
+    },
+  },
+  methods: {
+    handleClick() {
+      this.$router.push(this.link);
     },
   },
   computed: {

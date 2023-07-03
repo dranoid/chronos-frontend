@@ -1,14 +1,17 @@
 import { api } from "src/boot/axios";
 import { LocalStorage } from "quasar";
 
-async function getUsers() {
+async function getUsers(page = undefined, limit = undefined) {
   try {
-    const res = await api.get("http://localhost:3000/users", {
-      // headers: {
-      //   Authorization: `Bearer ${authToken}`,
-      // },
-    });
+    if (page && limit) {
+      const res = await api.get(
+        `http://localhost:3000/users?page=${page}&limit=${limit}`
+      );
+      const users = res.data;
+      return users;
+    }
 
+    const res = await api.get("http://localhost:3000/users");
     const users = res.data;
     return users;
   } catch (e) {

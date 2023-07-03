@@ -148,38 +148,61 @@ export default defineComponent({
     }
 
     const handleAddToCart = (payload) => {
+      // cos of refresh itempage getting mounted resets the count since count is not reflecting on db. choos whether instock disappears or not
       // Scaffolding the orderObj
       const orderObj = {
-        product: { id: 0, name: "", price: 0 },
+        product: { _id: 0, name: "", price: 0 },
         orderQuantity: 0,
       };
       orderObj.orderQuantity = payload.order_qty;
-      orderObj.product.id = payload.item.id;
+      orderObj.product._id = payload.item._id;
       orderObj.product.name = payload.item.name;
       orderObj.product.price = payload.item.price;
 
       // To update inventory
-      const itemIndex = findItemIndex(items.value, payload.item.id);
+      const itemIndex = findItemIndex(items.value, payload.item._id);
       const item = items.value[itemIndex];
       item.qty -= payload.order_qty;
 
       // To merge duplicates
-      const cartItemIndex = findCartItemIndex(cart.value, orderObj.product.id);
+      const cartItemIndex = findCartItemIndex(cart.value, orderObj.product._id);
+      console.log(cartItemIndex, "cim");
       if (cartItemIndex != undefined) {
         const cartItem = cart.value[cartItemIndex];
         cartItem.orderQuantity += orderObj.orderQuantity;
+
+        // Persist data
+        $q.localStorage.set("cart-details", cart.value);
+        $q.localStorage.set("items-details", items.value);
         return;
       }
       cart.value.push(orderObj);
+      console.log(cart.value, "cart value");
+      console.log(items.value, "item value", itemIndex);
+
+      // Persist data
       $q.localStorage.set("cart-details", cart.value);
+      $q.localStorage.set("items-details", items.value);
+      console.log(
+        $q.localStorage.getItem("items-details"),
+        items.value[itemIndex],
+        "check"
+      );
     };
     const handleDeleteItem = (payload) => {
       const delItem = cart.value.splice(payload, 1)[0];
 
       // To update inventory
-      const itemIndex = findItemIndex(items.value, delItem.product.id);
+      const itemIndex = findItemIndex(items.value, delItem.product._id);
       const item = items.value[itemIndex];
       item.qty += delItem.orderQuantity;
+
+      console.log(cart.value, "cart value del");
+      console.log(items.value, "item value del", itemIndex);
+
+      // Persist data
+      $q.localStorage.set("cart-details", cart.value);
+      $q.localStorage.set("items-details", items.value);
     };
     function handleEssentialClick(linkObj) {
       if (linkObj.title == "Logout") {

@@ -23,55 +23,34 @@
         lazy-rules
         :rules="[(val) => (val && val.length > 0) || 'Please type something']"
       />
-      <q-card>
-        <div v-for="(user, index) in filteredUsers" :key="index">
-          <q-card-section class="row justify-start">
-            <div class="col-8 self-end">
-              <q-input
-                filled
-                v-model="user.name"
-                label="User's name"
-                lazy-rules
-                :rules="[
-                  (val) => (val && val.length > 0) || 'Please type something',
-                ]"
-              />
-              <q-input
-                filled
-                type="email"
-                v-model="user.email"
-                label="Your Email Address..."
-                lazy-rules
-                :rules="[(val) => !!val || 'Email is missing', isValidEmail]"
-              />
-              <q-input
-                filled
-                v-model="user.roles[0]"
-                label="This should be a select between admin and user"
-                lazy-rules
-                :rules="[
-                  (val) => (val && val.length > 0) || 'Please type something',
-                ]"
-              />
-              <q-select
-                filled
-                v-model="user.roles[0]"
-                :options="['user', 'admin']"
-                label="Filled"
-              />
-              <p>ID: {{ user._id }}</p>
-            </div>
-            <div class="col-4 self-start">
-              <q-btn class="q-ma-md">Update</q-btn>
-              <q-btn class="q-ma-md">Delete</q-btn>
-            </div>
-          </q-card-section>
-        </div>
-      </q-card>
+
+      <div v-for="(user, index) in filteredUsers" :key="index">
+        <ManageUsers
+          :userObj="user"
+          @refresh-users="handleRefreshUsers"
+        ></ManageUsers>
+      </div>
+      <div class="row justify-end q-my-md">
+        <q-pagination
+          v-model="selectedUserPage"
+          :max="usersPageData.totalPages || 1"
+          @update:model-value="loadUserPageData"
+          direction-links
+          flat
+          color="grey"
+          active-color="primary"
+        />
+      </div>
     </div>
 
     <div class="items-crud">
-      <div class="text-h5 q-mt-xl">Manage Items</div>
+      <div class="text-h5 q-mt-xl">
+        Manage Items (reset form validation on additems form)
+      </div>
+
+      <div class="q-my-lg">
+        <AddItem @refresh-items="handleRefreshItems"></AddItem>
+      </div>
       <q-input
         class="q-mb-lg q-mt-sm"
         v-model="searchItem"
@@ -81,78 +60,24 @@
         lazy-rules
         :rules="[(val) => (val && val.length > 0) || 'Please type something']"
       />
-      <q-card class="q-pa-md">
-        <div v-for="(item, index) in filteredItems" :key="index">
-          <q-card-section class="row justify-start">
-            <div class="col-8 self-end">
-              <q-input
-                filled
-                v-model="item.name"
-                label="Item's name"
-                lazy-rules
-                :rules="[
-                  (val) => (val && val.length > 0) || 'Please type something',
-                ]"
-              />
-              <q-input
-                filled
-                v-model="item.description"
-                label="Item's description"
-                lazy-rules
-                :rules="[
-                  (val) => (val && val.length > 0) || 'Please type something',
-                ]"
-              />
-              <q-input
-                filled
-                v-model="item.qty"
-                label="Item's quantity"
-                type="number"
-                lazy-rules
-                :rules="[
-                  (val) => (val && val.length > 0) || 'Please type something',
-                ]"
-              />
-              <q-input
-                filled
-                v-model="item.price"
-                label="Item's price"
-                type="number"
-                lazy-rules
-                :rules="[
-                  (val) => (val && val.length > 0) || 'Please type something',
-                ]"
-              />
-              <p>ID: {{ item._id }}</p>
-            </div>
-            <div class="col-4 self-start">
-              <q-btn class="q-ma-md">Update</q-btn>
-              <q-btn class="q-ma-md">Delete</q-btn>
-            </div>
-          </q-card-section>
-        </div>
-        <div>
-          <q-toggle v-model="expanded" label="Expanded" class="q-mb-md" />
 
-          <q-expansion-item
-            v-model="expanded"
-            icon="perm_identity"
-            label="Account settings"
-            caption="John Doe"
-          >
-            <q-card>
-              <q-card-section>
-                This is where the add ite form will be Lorem ipsum dolor sit
-                amet, consectetur adipisicing elit. Quidem, eius reprehenderit
-                eos corrupti commodi magni quaerat ex numquam, dolorum officiis
-                modi facere maiores architecto suscipit iste eveniet doloribus
-                ullam aliquid.
-              </q-card-section>
-            </q-card>
-          </q-expansion-item>
-          <q-btn>Add Item</q-btn>
-        </div>
-      </q-card>
+      <div v-for="(item, index) in filteredItems" :key="index">
+        <ManageItems
+          :itemObj="item"
+          @refresh-items="handleRefreshItems"
+        ></ManageItems>
+      </div>
+      <div class="row justify-end q-my-md">
+        <q-pagination
+          v-model="selectedItemsPage"
+          :max="itemsPageData.totalPages || 1"
+          @update:model-value="loadItemsPageData"
+          direction-links
+          flat
+          color="grey"
+          active-color="primary"
+        />
+      </div>
     </div>
   </q-page>
 </template>
@@ -161,24 +86,40 @@
 import { ref, onMounted, computed } from "vue";
 import { getUsers } from "src/composables/users";
 import { getItems } from "src/composables/items";
+import ManageItems from "src/components/ManageItems.vue";
+import ManageUsers from "src/components/ManageUsers.vue";
+import AddItem from "src/components/AddItem.vue";
+
+// TODO (Add pagination and figure out how to update roles and Add patch and delete routes to backend)
 
 export default {
   // name: 'PageName',
+  components: {
+    ManageItems,
+    ManageUsers,
+    AddItem,
+  },
   setup() {
     const usersForMeta = ref([]);
+    const usersPageData = ref({});
     const itemsForMeta = ref([]);
+    const itemsPageData = ref({});
     const searchName = ref("");
     const searchItem = ref("");
+    const selectedUserPage = ref(1);
+    const selectedItemsPage = ref(1);
+    const userPageLimit = 5;
+    const itemPageLimit = 2;
 
     const userNum = computed(() => {
-      let num = usersForMeta.value.length;
+      let num = usersPageData.value.totalItems || 0;
       if (num < 10) {
         num = "0" + num;
       }
       return num;
     });
     const itemNum = computed(() => {
-      let num = itemsForMeta.value.length;
+      let num = itemsPageData.value.totalItems || 0;
       if (num < 10) {
         num = "0" + num;
       }
@@ -196,6 +137,7 @@ export default {
       return filt;
     });
     const filteredItems = computed(() => {
+      console.log(itemsForMeta.value, "woos");
       const filt = itemsForMeta.value.filter((item) => {
         return (
           item.name.toLowerCase().includes(searchItem.value.toLowerCase()) ||
@@ -209,17 +151,46 @@ export default {
       return filt;
     });
 
-    function isValidEmail(val) {
-      const emailPattern =
-        /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;
-      return emailPattern.test(val) || "Invalid email";
+    async function handleRefreshItems() {
+      performItemOp();
     }
-    async function fetchUserData() {
-      usersForMeta.value = await getUsers();
-      itemsForMeta.value = await getItems();
+
+    async function handleRefreshUsers() {
+      performUserOp();
+    }
+    async function performUserOp() {
+      const userData = await getUsers(selectedUserPage.value, userPageLimit);
+      usersForMeta.value = userData.users;
+      usersPageData.value = {
+        totalItems: userData.totalItems,
+        totalPages: userData.totalPages,
+        currentPage: userData.currentPage,
+        limit: userData.limit,
+      };
+    }
+    async function performItemOp() {
+      const itemsData = await getItems(selectedItemsPage.value, itemPageLimit);
+      console.log(itemsData, "wooobi");
+      itemsForMeta.value = itemsData.items;
+      itemsPageData.value = {
+        totalItems: itemsData.totalItems,
+        totalPages: itemsData.totalPages,
+        currentPage: itemsData.currentPage,
+        limit: itemsData.limit,
+      };
+    }
+    async function fetchData() {
+      performUserOp();
+      performItemOp();
+    }
+    async function loadUserPageData() {
+      performUserOp();
+    }
+    async function loadItemsPageData() {
+      performItemOp();
     }
     onMounted(() => {
-      fetchUserData();
+      fetchData();
     });
     return {
       searchName,
@@ -227,10 +198,17 @@ export default {
       filteredUsers,
       filteredItems,
       usersForMeta,
+      usersPageData,
       itemsForMeta,
+      itemsPageData,
       userNum,
       itemNum,
-      isValidEmail,
+      selectedUserPage,
+      selectedItemsPage,
+      handleRefreshItems,
+      handleRefreshUsers,
+      loadUserPageData,
+      loadItemsPageData,
     };
   },
 };

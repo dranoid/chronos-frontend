@@ -1,20 +1,33 @@
 import { api } from "src/boot/axios";
 
-const getItems = async () => {
+async function getItems(page = undefined, limit = undefined) {
   try {
-    console.log("items");
+    if (page && limit) {
+      const res = await api.get(
+        `http://localhost:3000/products?page=${page}&limit=${limit}`
+      );
+      const items = res.data;
+      console.log(
+        items,
+        "requst",
+        `http://localhost:3000/products?page=${page}&limit=${limit}`,
+        "link!!"
+      );
+      return items;
+    }
+
     const res = await api.get("http://localhost:3000/products");
     const items = res.data;
     return items;
   } catch (e) {
     console.log(e);
   }
-};
+}
 
 function findItemIndex(itemArr, payloadItemId) {
   let index = undefined;
   itemArr.forEach((item, ind) => {
-    if (item.id == payloadItemId) {
+    if (item._id == payloadItemId) {
       index = ind;
     }
   });
@@ -24,7 +37,7 @@ function findItemIndex(itemArr, payloadItemId) {
 function findCartItemIndex(cart, payloadItemId) {
   let index = undefined;
   cart.forEach((cartItem, ind) => {
-    if (cartItem.product.id == payloadItemId) {
+    if (cartItem.product._id == payloadItemId) {
       index = ind;
     }
   });
