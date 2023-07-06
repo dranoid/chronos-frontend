@@ -54,42 +54,6 @@ export default {
     const password = ref("");
 
     const login = async (email, pwd) => {
-      // setup () {
-      //   const $q = useQuasar()
-
-      //   $q.localStorage.set(key, value)
-      //   const value = $q.localStorage.getItem(key)
-
-      //   $q.sessionStorage.set(key, value)
-      //   const otherValue = $q.sessionStorage.getItem(key)
-      // }
-      // axios.post('url', {"body":data}, {
-      //     headers: {
-      //     'Content-Type': 'application/json'
-      //     }
-      //   }
-      // )
-      // axios.get('https://api.example.com/some-endpoint')
-      //   .then(response => {
-      //     // Read the access token from the response headers or body
-      //     const accessToken = response.headers['authorization']; // Assuming the access token is in the 'Authorization' header
-
-      //     // Use the access token as needed
-      //     console.log(accessToken);
-      //     // ... do something with the access token
-      //   })
-      //   .catch(error => {
-      //     // Handle error
-      //     console.error(error);
-      //   });
-
-      // try {
-      //   $q.localStorage.set(key, value)
-      // } catch (e) {
-      //   // data wasn't successfully saved due to
-      //   // a Web Storage API error
-      // }
-
       let user;
       const body = {
         email: email,
@@ -97,26 +61,15 @@ export default {
       };
 
       try {
-        const res = await api.post("http://localhost:3000/login", body);
+        const res = await api.post("/login", body);
         const data = res.data;
 
         $q.localStorage.set("access-token", data.access_token);
         user = data.user;
-
-        console.log(data.access_token);
-        console.log(data, "login");
       } catch (e) {
-        console.log(e);
         return;
       }
 
-      // const res = await axios.get("http://localhost:3000/users");
-      // const userList = res.data;
-      // const user = userList.find((user) => {
-      //   return user.email == email && user.password == pwd;
-      // });
-      // console.log(user, "user");
-      // console.log("Bearer eadb3.4j5kl$r".split("Bearer ")[1]);
       return user;
     };
 

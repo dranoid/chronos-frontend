@@ -70,7 +70,6 @@ export default {
     async function getOrders() {
       const res = await api.get("users/me/order");
       orderList.value = res.data;
-      console.log(res.data, "populated orders");
     }
     function total(orderListItem) {
       let amount = 0;

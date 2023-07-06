@@ -98,13 +98,11 @@ export default {
       };
 
       try {
-        const res = await api.post("http://localhost:3000/register", body);
+        const res = await api.post("/register", body);
         const data = res.data;
 
         $q.localStorage.set("access-token", data.access_token);
         emit("login-user", data.user);
-
-        console.log(data);
       } catch (e) {
         if (e.response)
           $q.notify({
@@ -113,7 +111,6 @@ export default {
             icon: "warning",
             message: e.response.data.message,
           });
-        console.log(e);
         return;
       }
       router.push("/");

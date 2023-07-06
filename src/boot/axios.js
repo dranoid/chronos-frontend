@@ -10,34 +10,15 @@ import { LocalStorage } from "quasar";
 // for each client)
 let api;
 export default boot(({ app }) => {
-  api = axios.create({ baseURL: "http://localhost:3000" });
+  api = axios.create({ baseURL: "https://chronos-store.onrender.com" });
 
   api.interceptors.request.use((config) => {
     const token = LocalStorage.getItem("access-token");
-    console.log(token, "booooot");
     if (token) {
-      console.log(token, "ooo");
       config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   });
-
-  // api.interceptors.response.use(
-  //   (response) => response,
-  //   (error) => {
-  //     const { $router } = app;
-  //     const { status } = error.response;
-
-  //     if (status === 401) {
-  //       console.log("weee");
-  //       $router.push("/login");
-  //     } else if (status === 403) {
-  //       $router.push("/");
-  //     }
-
-  //     return Promise.reject(error);
-  //   }
-  // );
 
   api.interceptors.response.use(
     (response) => response,
@@ -46,7 +27,6 @@ export default boot(({ app }) => {
       const router = app.config.globalProperties.$router;
 
       if (status === 401) {
-        console.log("weee");
         router.push("/login");
       } else if (status === 403) {
         router.push("/");

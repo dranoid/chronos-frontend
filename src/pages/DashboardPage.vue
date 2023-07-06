@@ -137,7 +137,6 @@ export default {
       return filt;
     });
     const filteredItems = computed(() => {
-      console.log(itemsForMeta.value, "woos");
       const filt = itemsForMeta.value.filter((item) => {
         return (
           item.name.toLowerCase().includes(searchItem.value.toLowerCase()) ||
@@ -170,7 +169,6 @@ export default {
     }
     async function performItemOp() {
       const itemsData = await getItems(selectedItemsPage.value, itemPageLimit);
-      console.log(itemsData, "wooobi");
       itemsForMeta.value = itemsData.items;
       itemsPageData.value = {
         totalItems: itemsData.totalItems,

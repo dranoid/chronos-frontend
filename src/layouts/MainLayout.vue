@@ -127,9 +127,7 @@ export default defineComponent({
     const items = ref([]);
 
     const isUserAdmin = computed(() => {
-      console.log(user.value, "admin comp");
       if (user.value) {
-        console.log(user.value, "admin comp cond");
         return user.value.roles[0] == "admin" ? true : false;
       }
       return false;
@@ -171,7 +169,6 @@ export default defineComponent({
 
       // To merge duplicates
       const cartItemIndex = findCartItemIndex(cart.value, orderObj.product._id);
-      console.log(cartItemIndex, "cim");
       if (cartItemIndex != undefined) {
         const cartItem = cart.value[cartItemIndex];
         cartItem.orderQuantity += orderObj.orderQuantity;
@@ -182,17 +179,10 @@ export default defineComponent({
         return;
       }
       cart.value.push(orderObj);
-      console.log(cart.value, "cart value");
-      console.log(items.value, "item value", itemIndex);
 
       // Persist data
       $q.localStorage.set("cart-details", cart.value);
       $q.localStorage.set("items-details", items.value);
-      console.log(
-        $q.localStorage.getItem("items-details"),
-        items.value[itemIndex],
-        "check"
-      );
     };
     const handleDeleteItem = (payload) => {
       const delItem = cart.value.splice(payload, 1)[0];
@@ -201,9 +191,6 @@ export default defineComponent({
       const itemIndex = findItemIndex(items.value, delItem.product._id);
       const item = items.value[itemIndex];
       item.qty += delItem.orderQuantity;
-
-      console.log(cart.value, "cart value del");
-      console.log(items.value, "item value del", itemIndex);
 
       // Persist data
       $q.localStorage.set("cart-details", cart.value);
@@ -224,12 +211,11 @@ export default defineComponent({
       $q.localStorage.set("user-details", refreshedUser.data);
     }
     async function logOut() {
-      const res = await api.get("http://localhost:3000/users/me/logout");
+      const res = await api.get("/users/me/logout");
       $q.localStorage.set("access-token", "");
       $q.localStorage.set("user-details", "");
       $q.localStorage.set("items-details", "");
       $q.localStorage.set("cart-details", []);
-      console.log($q.localStorage.getItem("cart-details"), "caaaart");
       router.push("/login");
     }
     function isTokenExpired(token) {
@@ -269,7 +255,6 @@ export default defineComponent({
         route.path != "/register"
       ) {
         // Token has expired, logout
-        console.log("iya yin mount");
         logOut();
       }
     });
@@ -283,7 +268,6 @@ export default defineComponent({
         route.path != "/register"
       ) {
         // Token has expired, logout
-        console.log("iya yin update", route.path);
         logOut();
       }
     });

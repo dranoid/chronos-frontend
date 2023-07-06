@@ -3,25 +3,15 @@ import { api } from "src/boot/axios";
 async function getItems(page = undefined, limit = undefined) {
   try {
     if (page && limit) {
-      const res = await api.get(
-        `http://localhost:3000/products?page=${page}&limit=${limit}`
-      );
+      const res = await api.get(`/products?page=${page}&limit=${limit}`);
       const items = res.data;
-      console.log(
-        items,
-        "requst",
-        `http://localhost:3000/products?page=${page}&limit=${limit}`,
-        "link!!"
-      );
       return items;
     }
 
-    const res = await api.get("http://localhost:3000/products");
+    const res = await api.get("/products");
     const items = res.data;
     return items;
-  } catch (e) {
-    console.log(e);
-  }
+  } catch (e) {}
 }
 
 function findItemIndex(itemArr, payloadItemId) {

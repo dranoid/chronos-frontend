@@ -119,7 +119,6 @@ export default {
     });
     const resetValidation = computed(() => {
       let exp = expanded.value;
-      console.log(expanded.value, "hehehe");
       nameEl.value.resetValidation();
       descriptionEl.value.resetValidation();
       priceEl.value.resetValidation();

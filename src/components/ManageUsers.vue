@@ -44,7 +44,6 @@ export default {
     const $q = useQuasar();
     const user = computed(() => props.userObj); // Apparently props aren't mutable
 
-    console.log(user.value, "manager");
     async function handleUpdate(id) {
       const body = {
         name: user.value.name,

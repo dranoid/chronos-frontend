@@ -4,19 +4,15 @@ import { LocalStorage } from "quasar";
 async function getUsers(page = undefined, limit = undefined) {
   try {
     if (page && limit) {
-      const res = await api.get(
-        `http://localhost:3000/users?page=${page}&limit=${limit}`
-      );
+      const res = await api.get(`/users?page=${page}&limit=${limit}`);
       const users = res.data;
       return users;
     }
 
-    const res = await api.get("http://localhost:3000/users");
+    const res = await api.get("/users");
     const users = res.data;
     return users;
-  } catch (e) {
-    console.log(e);
-  }
+  } catch (e) {}
 }
 
 function getUserRole() {

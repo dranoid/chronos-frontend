@@ -91,7 +91,6 @@ export default {
       });
       try {
         const res = await api.post("/users/me/order", orderBodyObj);
-        console.log("Order-placed", res.data);
         emit("place-order");
 
         $q.notify({
