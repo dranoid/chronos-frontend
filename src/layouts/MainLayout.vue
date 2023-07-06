@@ -67,6 +67,7 @@
           @delete-item="handleDeleteItem"
           @login-user="handleLoginUser"
           @get-item="handleGetItem"
+          @place-order="handlePlaceOrder"
           :cart="cart"
           :items="items"
           :user="user"
@@ -104,7 +105,7 @@ const linksList = [
     title: "Logout",
     caption: "Logout of this session",
     icon: "logout",
-    link: "/login",
+    // link: "/login",
     admin: false,
   },
 ];
@@ -126,7 +127,9 @@ export default defineComponent({
     const items = ref([]);
 
     const isUserAdmin = computed(() => {
+      console.log(user.value, "admin comp");
       if (user.value) {
+        console.log(user.value, "admin comp cond");
         return user.value.roles[0] == "admin" ? true : false;
       }
       return false;
@@ -139,6 +142,8 @@ export default defineComponent({
     });
 
     const handleLoginUser = (payload) => {
+      // To update UI to empty the cart
+      cart.value = $q.localStorage.getItem("cart-details");
       user.value = payload;
       $q.localStorage.set("user-details", payload);
     };
@@ -209,13 +214,23 @@ export default defineComponent({
         logOut();
       }
     }
-    function logOut() {
-      $q.localStorage.remove("access-token");
-      $q.localStorage.remove("user-details");
-      $q.localStorage.remove("items-details");
-      $q.localStorage.remove("cart-details");
+    async function handlePlaceOrder() {
+      router.push("/");
+      cart.value = [];
+      const refreshedUser = await api.get("users/me");
+      user.value = refreshedUser.data;
+      // Persist data
+      $q.localStorage.set("cart-details", cart.value);
+      $q.localStorage.set("user-details", refreshedUser.data);
+    }
+    async function logOut() {
+      const res = await api.get("http://localhost:3000/users/me/logout");
+      $q.localStorage.set("access-token", "");
+      $q.localStorage.set("user-details", "");
+      $q.localStorage.set("items-details", "");
+      $q.localStorage.set("cart-details", []);
+      console.log($q.localStorage.getItem("cart-details"), "caaaart");
       router.push("/login");
-      api.get("http://localhost:3000/users/me/logout");
     }
     function isTokenExpired(token) {
       try {
@@ -245,13 +260,30 @@ export default defineComponent({
       if ($q.localStorage.has("cart-details")) {
         cart.value = $q.localStorage.getItem("cart-details");
       }
+
+      const token = $q.localStorage.getItem("access-token");
+      if (
+        token &&
+        isTokenExpired(token) &&
+        route.path != "/login" &&
+        route.path != "/register"
+      ) {
+        // Token has expired, logout
+        console.log("iya yin mount");
+        logOut();
+      }
     });
 
     onUpdated(() => {
-      console.log("iya yin");
       const token = $q.localStorage.getItem("access-token");
-      if (token && isTokenExpired(token)) {
+      if (
+        token &&
+        isTokenExpired(token) &&
+        route.path != "/login" &&
+        route.path != "/register"
+      ) {
         // Token has expired, logout
+        console.log("iya yin update", route.path);
         logOut();
       }
     });
@@ -269,6 +301,7 @@ export default defineComponent({
       handleDeleteItem,
       handleGetItem,
       handleEssentialClick,
+      handlePlaceOrder,
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },

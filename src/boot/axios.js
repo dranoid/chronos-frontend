@@ -16,6 +16,7 @@ export default boot(({ app }) => {
     const token = LocalStorage.getItem("access-token");
     console.log(token, "booooot");
     if (token) {
+      console.log(token, "ooo");
       config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;

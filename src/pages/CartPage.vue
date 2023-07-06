@@ -51,8 +51,11 @@
 
 <script>
 import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import CartItem from "src/components/CartItem.vue";
+import { api } from "src/boot/axios";
+import router from "src/router";
 
 export default {
   // name: 'PageName',
@@ -79,9 +82,26 @@ export default {
       return props.cart || $q.localStorage.getItem("cart-details");
     });
 
-    const handleOrderClick = () => {
-      console.log("Order-placed");
-      emit("place-order");
+    const handleOrderClick = async () => {
+      const orderBodyObj = cartComp.value.map((cartItem) => {
+        return {
+          orderQuantity: cartItem.orderQuantity,
+          product: cartItem.product._id,
+        };
+      });
+      try {
+        const res = await api.post("/users/me/order", orderBodyObj);
+        console.log("Order-placed", res.data);
+        emit("place-order");
+
+        $q.notify({
+          color: "green-5",
+          textColor: "white",
+          icon: "check",
+          message:
+            "Your order has been placed successfully. Check profile for Order Id",
+        });
+      } catch (error) {}
     };
 
     return {
