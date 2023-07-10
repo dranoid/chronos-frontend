@@ -44,9 +44,7 @@
     </div>
 
     <div class="items-crud">
-      <div class="text-h5 q-mt-xl">
-        Manage Items (reset form validation on additems form)
-      </div>
+      <div class="text-h5 q-mt-xl">Manage Items</div>
 
       <div class="q-my-lg">
         <AddItem @refresh-items="handleRefreshItems"></AddItem>
